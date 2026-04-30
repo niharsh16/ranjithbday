@@ -4,11 +4,7 @@ project:
 
 website:
   title: "ranjithbday"
-  navbar:
-    left:
-      - href: index.qmd
-        text: Home
-      - about.qmd
+  navbar: false
 
 format:
   html:
