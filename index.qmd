@@ -376,6 +376,10 @@ preloadImages.forEach(src => {
   img.src = src;
 });
 
+preloadAudio.addEventListener("canplaythrough", () => {
+  console.log("Voice note fully preloaded");
+});
+
 
 let confettiOpacity = 1;
 let fadingConfetti = false;
