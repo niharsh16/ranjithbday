@@ -37,8 +37,8 @@ body {
 
 /* Button */
 button {
-  padding: 15px 30px;
-  font-size: 22px;
+  padding: 20px 40px;
+  font-size: 35px;
   border: none;
   border-radius: 12px;
   background: #1C4A5A;
@@ -177,6 +177,87 @@ canvas {
   border-radius: 12px;
 }
 
+.hidden {
+  display: none;
+}
+
+.secretButton {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  padding: 10px 18px;
+  font-size: 12px;
+  border-radius: 2px;
+  background-color: #5FB2CE;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  z-index: 10; /* ensures it stays above background but below cards */
+}
+
+
+.secretButton:hover {
+  transform: scale(1.05);
+}
+
+.secretSection {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100vw;
+  height: 100vh;
+
+  z-index: 20;
+}
+
+
+
+.secretContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 50px;
+
+  background: white;
+  padding: 50px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+
+  width: 75vw;          /* nice wide layout */
+  max-width: 1200px;    /* prevents it from getting too huge */
+}
+
+
+
+.secretPhoto {
+  width: 350px;
+  height: 450px;
+  background: #ddd;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.secretText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+audio {
+  margin-top: 20px;
+  width: 100%;
+}
+
+
 </style>
 </head>
 
@@ -212,7 +293,7 @@ canvas {
         <img src="images/wish1.png">
       </div>
       <div class="cardBack">
-        <p> Happy happy birthday daddy! You're such an inspiring and cool person. Growing up, I always looked up to you. You've been such a supportive and caring figure in my life. From something as simple as trying to pump air into a broken 'h' balloon to helping me achieve a big milestone by pushing me to do my arangatrum, you always showed your love and stood up for me in my life. Although we are millions of miles away, I hope this mini website brought us a bit closer 🤍 </p>
+        <p> Happy happy birthday daddy! You're such an inspiring and cool person. Growing up, I always looked up to you. You've been such a supportive and caring figure in my life. From something as simple as trying to pump air into a broken 'h' balloon to helping me achieve a big milestone by pushing me to do my arangetram, you always showed your love and stood up for me all these years. Although we are thousands of miles away, I hope this mini website brought us a bit closer 🤍 </p>
       </div>
     </div>
   </div>
@@ -242,6 +323,25 @@ Cheers to many more years and many more bad jokes!</p>
   </div>
 </div>
 
+<div id="secretSection" class="hidden secretSection">
+  <div class="secretContainer">
+    <img src="images/pati.png" class="secretPhoto">
+
+    <div class="secretText">
+      <p>
+        Here’s a little something I found tucked away…  
+        She may not be with us today but she's always wishing the best for you.
+        Just a small random memory, but hopefully it gives you a sense of her presence. 
+      </p>
+
+      <audio controls>
+        <source src="images/Pativm.mp3" type="audio/mpeg">
+      </audio>
+    </div>
+  </div>
+</div>
+
+
 
 <!-- SCREEN 1 -->
 <div id="screen1" class="screen">
@@ -256,7 +356,26 @@ Cheers to many more years and many more bad jokes!</p>
 <!-- FINAL MESSAGE -->
 <div id="finalMessage">HAPPY BIRTHDAY DADDY 🎂</div>
 
+<button id="secretButton" class="secretButton hidden" onclick="showSecretSection()">
+  A little smtg...
+</button>
+
 <script>
+
+const preloadImages = [
+  "images/munnardad.png",
+  "images/japdad.png",
+  "images/bobadad.png",
+  "images/chickendad.png",
+  "images/mariodad.png",
+  "images/boatdad.png"
+];
+
+preloadImages.forEach(src => {
+  const img = new Image();
+  img.src = src;
+});
+
 
 let confettiOpacity = 1;
 let fadingConfetti = false;
@@ -285,7 +404,7 @@ const messages = [
   "Hey...",
   "Today is a special day 👀",
   "Someone amazing was born today...",
-  "And I have a surprise for you 🎁"
+  "And we have a surprise for you 🎁"
 ];
 
 let index = 0;
@@ -388,18 +507,18 @@ function explode() {
         p.x = Math.random() * canvas.width;
       }
     });
-    
-    if (fadingConfetti) {
-  confettiOpacity -= 0.02;   // fade speed (0.02 = 50 frames ≈ 1 sec)
-  if (confettiOpacity <= 0) {
-    confettiOpacity = 0;
-    confettiActive = false;  // stop animation
-    fadingConfetti = false;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    return;                  // exit loop
-  }
-}
 
+    // Fade-out logic
+    if (fadingConfetti) {
+      confettiOpacity -= 0.02;
+      if (confettiOpacity <= 0) {
+        confettiOpacity = 0;
+        confettiActive = false;
+        fadingConfetti = false;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+    }
 
     if (confettiActive) {
       requestAnimationFrame(animateConfetti);
@@ -412,13 +531,24 @@ function explode() {
   document.getElementById("finalMessage").style.display = "block";
   document.getElementById("photoMusic").play();
 
+  // Fade out music at 37 seconds
   setTimeout(() => {
-  fadeOutMusic(document.getElementById("photoMusic"), 3000); 
-}, 37000);
+    fadeOutMusic(document.getElementById("photoMusic"), 3000);
+  }, 37000);
 
+  // ⭐ NEW TIMING ⭐
+  // Step 1: Let confetti + message run for 4 seconds
+  setTimeout(() => {
+    fadingConfetti = true;   // start confetti fade-out
+  }, 4000);
 
-  setTimeout(showPhotos, 5000);
+  // Step 2: After confetti finishes fading (1 sec), wait 1 more sec
+  // Then show photos
+  setTimeout(() => {
+    showPhotos();
+  }, 4000 + 1000 + 500); // 4s confetti + 1s fade + 1s pause
 }
+
 
 
 function animate() {
@@ -440,7 +570,6 @@ function animate() {
 /* ================= PHOTOS (AFTER BIRTHDAY MESSAGE) ================= */
 
 function showPhotos() {
-  fadingConfetti = true;
 
   document.getElementById("finalMessage").style.display = "none";
 
@@ -483,14 +612,32 @@ function showWishesStory() {
   wishesScreen.classList.remove("hidden");
 
   const wishesText = document.getElementById("wishesText");
-  wishesText.innerHTML = `<div class="fadeText">...here are some wishes from us &lt;3</div>`;
+  wishesText.innerHTML = `<div class="fadeText">here are some wishes from us &lt;3...</div>`;
 
   // After text fades → show cards
   setTimeout(() => {
     wishesScreen.classList.add("hidden");
     document.getElementById("wishesCards").classList.remove("hidden");
   }, 3000);
+  
+  setTimeout(() => {
+    document.getElementById("secretButton").classList.remove("hidden");
+  }, 15000); // show button 3 seconds after cards appear
+
+
 }
+
+function showSecretSection() {
+  // Hide everything else
+  document.getElementById("wishesCards").style.display = "none";
+  document.getElementById("photoGrid").style.display = "none";
+  document.getElementById("finalMessage").style.display = "none";
+  document.getElementById("secretButton").style.display = "none";
+
+  // Show the secret section
+  document.getElementById("secretSection").classList.remove("hidden");
+}
+
 
 
 </script>
